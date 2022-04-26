@@ -21,9 +21,20 @@ async function run() {
         const productsCollection = client.db('ema-john-practice').collection('products')
 
         app.get('/product', async (req, res) => {
+            console.log('query', req.query)
+            const page = parseInt(req.query.page)
+            const size = parseInt(req.query.size)
             const query = {}
             const cursor = productsCollection.find(query)
-            const products = await cursor.toArray()
+            let products
+            if (page || size) {
+                products = await cursor.skip(page * size).limit(size).toArray()
+
+            }
+            else {
+                products = await cursor.toArray()
+            }
+
             res.send(products)
         })
 
